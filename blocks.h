@@ -29,6 +29,8 @@ inode *initInode(int argInode, int argType, int argBlock);
 inode *inodeLibre(inode *inodes);
 inode *noInodeToInode(superBlock *sb, int argInode);
 
+void toStringInode(superBlock *sb);
+
 struct blockF{
 	int noInode;
 	int used; //0 inutilise 1 utilise
@@ -42,18 +44,20 @@ blockF *initBlockFvide(int inodeF);
 blockF *noInodeToBlockF(superBlock *sb, int argInode);
 blockF *blockFLibre(blockF *blocksF);
 int creerFicher(superBlock *sb, int inodeDossier, char *nomfile);
+void supprFichier(superBlock *sb, int inodeFichier, int dossier);
 
 struct blockD{
 	int noInode;
 	int noBlockD;
-	char *sousDirect[255];
-	int inodes[255];
+	char *sousDirect[20];
+	int inodes[20];
 	blockD *next;	
 } BLOCKD_T;
 
 blockD *initDirec(int inodeDirect, int inodePapa, int argBlock);
 blockD *blockDLibre(blockD *blocksD);
 void creaDir(superBlock *sb, int noInodeParent, char *nomDir);
+void supprDir(superBlock *sb, int argInode);
 void toStringBlockD(blockD *block);
 blockD *noInodeToBlockD(superBlock *sb, int argInode);
 

@@ -13,7 +13,7 @@ superBlock *initSGF(){
 	tmp->blocksD = initDirec(1,1,1);
 	
 	//initilisation des blocks Fichier
-	tmp->blocksF = initBlockFvide(1);
+	tmp->blocksF = initBlockFvide(0);
 	tmp->blocksF->noBlockF=1;
 	return tmp;   
 }
@@ -34,10 +34,11 @@ blockD *initDirec(int inodeDirect, int inodePapa, int argBlock){
 	tmp->noBlockD=argBlock;
 	tmp->sousDirect[0]=".";
 	tmp->sousDirect[1]="..";
+	tmp->noInode=inodeDirect;
 	tmp->inodes[0] = inodeDirect;
 	tmp->inodes[1] = inodePapa;
 	int i;
-	for(i=2;i<255;i++){
+	for(i=2;i<20;i++){
 		tmp->inodes[i]=0;
 	}
 	tmp->next=NULL;
@@ -87,6 +88,7 @@ blockF *blockFLibre(blockF *blocksF){
 	}
 	else{
 		tmp->nextBlock=initBlockFvide(0);
+		tmp->nextBlock->noBlockF=tmp->noBlockF+1;
 		return tmp->nextBlock;
 	}
 		
@@ -110,10 +112,20 @@ void toStringBlockD(blockD *block){
 
 	printf("inode du block : %d\n",block->noInode);
 	int i=0;
-	while(block->inodes[i]!=0){
+	for(i=0;i<20;i++){
+		if(block->inodes[i]!=0){
 		printf("%s    -    %d\n",block->sousDirect[i],block->inodes[i]);
-		i++;
+		}
 	}
+}
+void toStringInode(superBlock *sb){
+	inode *tmpI=sb->inodes;
+	printf("----------TABLE INODES -----------\n");
+	while(tmpI!=NULL){
+		printf("inode %d, type %d, block %d\n",tmpI->noInode, tmpI->typeBlock, tmpI->block);
+		tmpI=tmpI->next;
+	}
+	
 }
 
 void creaDir(superBlock *sb, int noInodeParent, char *nomDir){
@@ -142,6 +154,25 @@ void creaDir(superBlock *sb, int noInodeParent, char *nomDir){
 	
 }
 
+void supprDir(superBlock *sb, int argInode){
+    blockD *tmpD = noInodeToBlockD(sb, argInode);
+    blockD *parent =noInodeToBlockD(sb, tmpD->inodes[1]);
+    inode *tmpI = noInodeToInode(sb, argInode);
+    tmpI->typeBlock=2; //on met l'inode a etat inutilise
+    
+    int i;
+    for(i=0;i<20;i++){
+		tmpD->inodes[i]=0;
+		tmpD->sousDirect[i]=NULL;	
+	}
+	i=0;
+	while(parent->inodes[i]!=argInode){
+		i++;
+	}
+	parent->inodes[i]=0;
+	parent->sousDirect[i]=NULL;
+}
+
 int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fichier -vide- dans un dossier, retourne inode
     	//on lui cherche un inode disponible
     	inode *tmpI = inodeLibre(sb->inodes);
@@ -157,7 +188,27 @@ int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fich
 		}
 		tmpD->inodes[i]=tmpI->noInode;
 		tmpD->sousDirect[i]=nomfile;
+		tmpI->block =tmpF->noBlockF;
 		return tmpI->noInode;  		
+}
+
+void supprFichier(superBlock *sb, int argInode, int dossier){
+		inode *tmpI = noInodeToInode(sb, argInode);
+		tmpI->typeBlock=2; //on libere l'inode
+		blockF *tmpF = noInodeToBlockF(sb, argInode);
+		while(tmpF->nextF!=NULL){
+			printf("ca va merder\n");
+			tmpF->used=0; //on passe tous les blockF du fichier a l'état inutilisé
+			tmpF=tmpF->nextF;
+		}
+		//on le retire de la table du dossier
+		blockD *tmpD = noInodeToBlockD(sb,dossier);
+		int i=2;
+		while(tmpD->inodes[i]!=argInode){
+			i++;
+		}
+		tmpD->inodes[i]=0;
+		tmpD->sousDirect[i]=NULL;
 }
 
 inode *noInodeToInode(superBlock *sb, int argInode){
