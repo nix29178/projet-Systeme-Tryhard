@@ -13,7 +13,8 @@ superBlock *initSGF(){
 	tmp->blocksD = initDirec(1,1,1);
 	
 	//initilisation des blocks Fichier
-	tmp->blocksF = initBlockFvide(1,1);
+	tmp->blocksF = initBlockFvide(1);
+	tmp->blocksF->noBlockF=1;
 	return tmp;   
 }
 
@@ -43,11 +44,12 @@ blockD *initDirec(int inodeDirect, int inodePapa, int argBlock){
 	return tmp;
 }
 
-blockF *initBlockFvide(int inodeF, int argBlock){
+blockF *initBlockFvide(int inodeF){ //initialiste un blockF sans noBlock attribué et used a 0
 	
 	blockF *tmp =malloc(sizeof(blockF));
 	tmp->noInode=inodeF;
-	tmp->noBlockF=argBlock;
+	tmp->noBlockF=0;
+	tmp->used=0;
 	int i;
 	for(i=0; i<8; i++){
 		tmp->contenu[i]=NULL;
@@ -63,13 +65,31 @@ inode *inodeLibre(inode *inodes){//cherche un inode de libre si n'existe pas en 
     while(tmp->typeBlock!=2 && tmp->next!=NULL){
 		tmp = tmp->next;
 	}
-	if(tmp->next!=NULL){
+	if(tmp->typeBlock==2){
+		//printf("inode recycle no %d\n",tmp->noInode);
 		return tmp;
 	}
 	else{
 		tmp->next=initInode(tmp->noInode+1, 2, 0);
+		//printf("nouveau inode no %d\n",tmp->next->noInode);
 		return tmp->next;
 	}
+	
+}
+
+blockF *blockFLibre(blockF *blocksF){
+    blockF *tmp = blocksF;
+    while(tmp->used!=0 || tmp->nextBlock!=NULL){
+		tmp=tmp->nextBlock;
+	}
+	if(tmp->used==0){
+		return tmp;
+	}
+	else{
+		tmp->nextBlock=initBlockFvide(0);
+		return tmp->nextBlock;
+	}
+		
 }
 
 blockD *blockDLibre(blockD *blocksD){ // cherche un block directory libre si n'existe pas en créé un 
@@ -96,11 +116,14 @@ void toStringBlockD(blockD *block){
 	}
 }
 
-void creaDir(superBlock *sb, blockD *parent, char *nomDir){
+void creaDir(superBlock *sb, int noInodeParent, char *nomDir){
+	
+	blockD *parent = noInodeToBlockD(sb, noInodeParent);
 	
 	int noInode, noBlock;
 	inode *placeInode = inodeLibre(sb->inodes);
 	noInode = placeInode->noInode;
+	placeInode->typeBlock=0;
 	
 	blockD *placeBlock = blockDLibre(sb->blocksD);
 	noBlock = placeBlock->noBlockD;
@@ -117,4 +140,69 @@ void creaDir(superBlock *sb, blockD *parent, char *nomDir){
 	parent->inodes[i]=noInode;
 	parent->sousDirect[i]=nomDir;
 	
+}
+
+int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fichier -vide- dans un dossier, retourne inode
+    	//on lui cherche un inode disponible
+    	inode *tmpI = inodeLibre(sb->inodes);
+    	tmpI->typeBlock=1;
+    	blockD *tmpD = noInodeToBlockD(sb, inodeDossier);
+    	
+    	blockF *tmpF = blockFLibre(sb->blocksF);//on cherche un blockF de libre ou on le créer
+    	tmpF->used=1;//on le marque comme utilise
+    	tmpF->noInode=tmpI->noInode;
+    	int i=2;
+    	while(tmpD->inodes[i]!=0){
+			i++;
+		}
+		tmpD->inodes[i]=tmpI->noInode;
+		tmpD->sousDirect[i]=nomfile;
+		return tmpI->noInode;  		
+}
+
+inode *noInodeToInode(superBlock *sb, int argInode){
+    inode *tmp = sb->inodes;
+    while(tmp->noInode!=argInode && tmp!=NULL){
+		tmp=tmp->next;  //on cherche le numéro de block dans la table d'inodes
+	}
+	if(tmp == NULL){
+		// si l'inode n'a été trouvé : erreur	
+		printf("erreur critique : inode %d non trouve\n",argInode);
+		exit(2);
+	} 
+	else{
+		return tmp;
+	}
+}
+
+blockD *noInodeToBlockD(superBlock *sb, int argInode){
+    inode *tmpI = noInodeToInode(sb,argInode);
+    if(tmpI->typeBlock!=0){
+		printf("erreur critique : l'inode %d ne pointe pas sur les repertoires\n",argInode);
+		exit(2);
+	}
+	int block = tmpI->block; 
+	blockD *tmpD = sb->blocksD;
+	while(tmpD->noBlockD!=block && tmpD!=NULL){
+		tmpD=tmpD->next; //on cherche le blockD
+	}
+	if(tmpD==NULL){
+		printf("erreur critique : le blockD no %d n'existe pas\n",block);
+		exit(2);
+	}
+	else{
+		return tmpD;
+	}		
+}
+
+blockF *noInodeToBlockF(superBlock *sb, int argInode){
+    
+    inode *tmp = noInodeToInode(sb, argInode);
+	int block = tmp->block; 
+	blockF *tmpF = sb->blocksF;
+	while(tmpF->noBlockF!=block && tmpF !=NULL){
+		tmpF=tmpF->nextBlock; //on cherche le blockF et on le retourne
+	}
+	if(tmpF == NULL){printf("erreur critique : block no %d non trouve\n",block); exit(2);}
+	return tmpF;		
 }

@@ -1,15 +1,15 @@
 #include <stdio.h>
-#include "inodes.h"
+#include "blocks.h"
 
 int main(){
 
-	dossier *racine = initSGF();
-	printf("%s\n",racine->nom);
-	creerSousDossier(racine, "test");
-	creerSousDossier(racine, "test2");
-	creerSousDossier(racine, "test3");
-	creerFichierVide(racine, "testDeFichier");
-	afficherContenuD(racine);
+	superBlock *sb = initSGF();
+	//printf("%s\n",sb->blocksD->nom);
+	creaDir(sb,1,"test1");
+	creaDir(sb,1,"test2");
+	creerFicher(sb,1,"testDeFichier");
+	
+	toStringBlockD(sb->blocksD);
 
 	return 0;
 }
