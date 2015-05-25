@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "blocks.h"
 
 superBlock *initSGF(){
@@ -80,7 +81,7 @@ inode *inodeLibre(inode *inodes){//cherche un inode de libre si n'existe pas en 
 
 blockF *blockFLibre(blockF *blocksF){
     blockF *tmp = blocksF;
-    while(tmp->used!=0 || tmp->nextBlock!=NULL){
+    while(tmp->used!=0 && tmp->nextBlock!=NULL){
 		tmp=tmp->nextBlock;
 	}
 	if(tmp->used==0){
@@ -124,6 +125,16 @@ void toStringInode(superBlock *sb){
 	while(tmpI!=NULL){
 		printf("inode %d, type %d, block %d\n",tmpI->noInode, tmpI->typeBlock, tmpI->block);
 		tmpI=tmpI->next;
+	}
+	
+}
+
+void toStringBlocksF(superBlock *sb){
+	blockF *tmpF=sb->blocksF;
+	printf("----------TABLE BlocksF -----------\n");
+	while(tmpF!=NULL){
+		printf("block %d, used %d, inode %d\n",tmpF->noBlockF, tmpF->used, tmpF->noInode);
+		tmpF=tmpF->nextBlock;
 	}
 	
 }
@@ -183,6 +194,7 @@ int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fich
     	tmpF->used=1;//on le marque comme utilise
     	tmpF->noInode=tmpI->noInode;
     	int i=2;
+    	//on l'index dans le dossier
     	while(tmpD->inodes[i]!=0){
 			i++;
 		}
@@ -209,6 +221,54 @@ void supprFichier(superBlock *sb, int argInode, int dossier){
 		}
 		tmpD->inodes[i]=0;
 		tmpD->sousDirect[i]=NULL;
+}
+
+void modifContenu(superBlock *sb, int argInode, char *argContenu){//ecrase le contenu d'un fichier
+		blockF *tmpF = noInodeToBlockF(sb, argInode);
+		int taille=strlen(argContenu), nbBlock=(taille/8)+1;
+		printf("taille : %d - nombre de block : %d\n",taille,nbBlock);
+		int i=1,j;
+		tmpF->contenu[0]=argContenu[0];
+		printf("[%c",argContenu[0]);
+		while(i<taille){
+			if(i%8==0){
+				if(tmpF->nextF==NULL){
+					printf("][");
+					tmpF->nextF=blockFLibre(sb->blocksF);
+					tmpF->nextF->noInode=argInode;
+					tmpF->nextF->used=1;
+				}
+				tmpF=tmpF->nextF;
+			}
+			printf("%c",argContenu[i]);
+			tmpF->contenu[i%8]=argContenu[i];
+			
+			i++;
+		}
+		printf("]\n");
+}
+
+
+char * lireFichier(superBlock *sb, int argInode){
+		blockF *tmpF = noInodeToBlockF(sb, argInode);
+		int nbBlock =0;
+		while(tmpF->nextF!=NULL){//on compte le nombre de block que prend le fichier
+			nbBlock++;
+			tmpF=tmpF->nextF;
+		}
+		printf("hey petit coeur on va lire %d blocks",nbBlock);
+		char *cont = malloc(sizeof(char)*(8*nbBlock)); //on fait un malloc en conséquant 
+		int i,j;
+		for(i=0; i<nbBlock;i++){
+			for(j=0;j<8;j++){
+				if(tmpF->contenu[j]!=NULL)
+				printf("%c",tmpF->contenu[j]);
+			}
+			if(tmpF->nextF!=NULL)
+			tmpF=tmpF->nextF;
+		}
+		return cont;
+		
 }
 
 inode *noInodeToInode(superBlock *sb, int argInode){

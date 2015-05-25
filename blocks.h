@@ -45,6 +45,9 @@ blockF *noInodeToBlockF(superBlock *sb, int argInode);
 blockF *blockFLibre(blockF *blocksF);
 int creerFicher(superBlock *sb, int inodeDossier, char *nomfile);
 void supprFichier(superBlock *sb, int inodeFichier, int dossier);
+char * lireFichier(superBlock *sb, int argInode);
+
+void toStringBlocksF(superBlock *sb);
 
 struct blockD{
 	int noInode;
