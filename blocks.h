@@ -61,7 +61,7 @@ blockD *initDirec(int inodeDirect, int inodePapa, int argBlock);
 blockD *blockDLibre(blockD *blocksD);
 void creaDir(superBlock *sb, int noInodeParent, char *nomDir);
 void supprDir(superBlock *sb, int argInode);
-void toStringBlockD(blockD *block);
+void toStringBlockD(superBlock *sb, int argInode);
 blockD *noInodeToBlockD(superBlock *sb, int argInode);
 
 #endif

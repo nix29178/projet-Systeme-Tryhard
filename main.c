@@ -2,27 +2,8 @@
 #include <stdlib.h>
 #include "blocks.h"
 
-void test(char *arg){
-	int taille =strlen(arg);
-	printf("%d\n",taille);
-	int i=1;
-	printf("[");
-	printf("%c",arg[0]);
-	
-	while(i<taille){
-		if(i%8==0){
-			printf("]");
-			printf("[");
-		}
-		printf("%c",arg[i]);
-		i++;		
-	}
-	printf("]\n");
-}
 
 int main(){
-	char * pute= "12345678 9abcd efg123456'789";
-    //test(pute);
 	superBlock *sb = initSGF();
 	creaDir(sb,1,"test1");
 	creaDir(sb,1,"test2");
@@ -30,9 +11,18 @@ int main(){
 	creerFicher(sb,1,"testDeFichier2");
 	
 	modifContenu(sb,4, "Bonjour je m'appelle Nicolas Le Bourhis et j'atteste que Cosmin est le +++ beau gosse de la terre");
-	char *test = lireFichier(sb,4);
+	//char *test = lireFichier(sb,4);
 	//printf("%s\n",test);
-	//toStringBlocksF(sb);
+	creerFicher(sb,1,"testDeFichier3");
+	supprFichier(sb, 4,1);
+	modifContenu(sb,5, "azertyaz dzaza azd az azdazdazd");
+	creaDir(sb,1,"testDirMille");
+	int i;
+	for(i=0;i<19;i++)
+	    creerFicher(sb,1,"a");
+	toStringBlocksF(sb);
+	toStringInode(sb);
+	toStringBlockD(sb,1);
 	
 	return 0;
 }

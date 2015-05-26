@@ -85,11 +85,13 @@ blockF *blockFLibre(blockF *blocksF){
 		tmp=tmp->nextBlock;
 	}
 	if(tmp->used==0){
+		tmp->used=1;
 		return tmp;
 	}
 	else{
 		tmp->nextBlock=initBlockFvide(0);
 		tmp->nextBlock->noBlockF=tmp->noBlockF+1;
+		tmp->nextBlock->used=1;
 		return tmp->nextBlock;
 	}
 		
@@ -109,8 +111,9 @@ blockD *blockDLibre(blockD *blocksD){ // cherche un block directory libre si n'e
 	}	
 }
 
-void toStringBlockD(blockD *block){
+void toStringBlockD(superBlock *sb, int argInode){
 
+    blockD *block=noInodeToBlockD(sb, argInode);
 	printf("inode du block : %d\n",block->noInode);
 	int i=0;
 	for(i=0;i<20;i++){
@@ -185,23 +188,32 @@ void supprDir(superBlock *sb, int argInode){
 }
 
 int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fichier -vide- dans un dossier, retourne inode
+	    	//on l'index dans le dossier si y'a de la place
+	    int i=2;
+	    blockD *tmpD = noInodeToBlockD(sb, inodeDossier);
+    	while(tmpD->inodes[i]!=0 && i<20){
+			i++;
+		}
+		if(i==20){
+			printf("dossier plein\n");
+			return 0;
+		}
+		else{
     	//on lui cherche un inode disponible
     	inode *tmpI = inodeLibre(sb->inodes);
     	tmpI->typeBlock=1;
-    	blockD *tmpD = noInodeToBlockD(sb, inodeDossier);
+
     	
     	blockF *tmpF = blockFLibre(sb->blocksF);//on cherche un blockF de libre ou on le créer
     	tmpF->used=1;//on le marque comme utilise
     	tmpF->noInode=tmpI->noInode;
-    	int i=2;
-    	//on l'index dans le dossier
-    	while(tmpD->inodes[i]!=0){
-			i++;
-		}
+    	
+
 		tmpD->inodes[i]=tmpI->noInode;
 		tmpD->sousDirect[i]=nomfile;
 		tmpI->block =tmpF->noBlockF;
-		return tmpI->noInode;  		
+		return tmpI->noInode; 
+	} 		
 }
 
 void supprFichier(superBlock *sb, int argInode, int dossier){
@@ -209,10 +221,10 @@ void supprFichier(superBlock *sb, int argInode, int dossier){
 		tmpI->typeBlock=2; //on libere l'inode
 		blockF *tmpF = noInodeToBlockF(sb, argInode);
 		while(tmpF->nextF!=NULL){
-			printf("ca va merder\n");
 			tmpF->used=0; //on passe tous les blockF du fichier a l'état inutilisé
 			tmpF=tmpF->nextF;
 		}
+		tmpF->used=0;
 		//on le retire de la table du dossier
 		blockD *tmpD = noInodeToBlockD(sb,dossier);
 		int i=2;
@@ -246,6 +258,10 @@ void modifContenu(superBlock *sb, int argInode, char *argContenu){//ecrase le co
 			i++;
 		}
 		printf("]\n");
+		while(tmpF->nextF !=NULL){
+			tmpF=tmpF->nextF;
+			tmpF->used=0;
+		}
 }
 
 
