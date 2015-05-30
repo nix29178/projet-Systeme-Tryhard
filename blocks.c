@@ -272,19 +272,17 @@ char * lireFichier(superBlock *sb, int argInode){
 			nbBlock++;
 			tmpF=tmpF->nextF;
 		}
-		printf("hey petit coeur on va lire %d blocks",nbBlock);
 		char *cont = malloc(sizeof(char)*(8*nbBlock)); //on fait un malloc en conséquant 
-		int i,j;
-		for(i=0; i<nbBlock;i++){
+		tmpF = noInodeToBlockF(sb, argInode);
+		int i=0,j;
+		while(tmpF!=NULL){
 			for(j=0;j<8;j++){
-				if(tmpF->contenu[j]!=NULL)
-				printf("%c",tmpF->contenu[j]);
+				cont[(i*8)+j] =tmpF->contenu[j];
 			}
-			if(tmpF->nextF!=NULL)
+			i++;
 			tmpF=tmpF->nextF;
 		}
-		return cont;
-		
+		return cont;	
 }
 
 inode *noInodeToInode(superBlock *sb, int argInode){
