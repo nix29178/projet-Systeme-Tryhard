@@ -238,26 +238,21 @@ void supprFichier(superBlock *sb, int argInode, int dossier){
 void modifContenu(superBlock *sb, int argInode, char *argContenu){//ecrase le contenu d'un fichier
 		blockF *tmpF = noInodeToBlockF(sb, argInode);
 		int taille=strlen(argContenu), nbBlock=(taille/8)+1;
-		printf("taille : %d - nombre de block : %d\n",taille,nbBlock);
 		int i=1,j;
 		tmpF->contenu[0]=argContenu[0];
-		printf("[%c",argContenu[0]);
 		while(i<taille){
 			if(i%8==0){
 				if(tmpF->nextF==NULL){
-					printf("][");
 					tmpF->nextF=blockFLibre(sb->blocksF);
 					tmpF->nextF->noInode=argInode;
 					tmpF->nextF->used=1;
 				}
 				tmpF=tmpF->nextF;
 			}
-			printf("%c",argContenu[i]);
 			tmpF->contenu[i%8]=argContenu[i];
 			
 			i++;
 		}
-		printf("]\n");
 		while(tmpF->nextF !=NULL){
 			tmpF=tmpF->nextF;
 			tmpF->used=0;

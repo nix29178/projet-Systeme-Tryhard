@@ -1,6 +1,6 @@
 #include "blocks.h"
 
-touch(superBlock *sb, int argInode, char *nomFichier){
+void touch(superBlock *sb, int argInode, char *nomFichier){
 	 
 	 blockD *tmpD=noInodeToBlockD(sb,argInode);
 	 int ok=1,i=2;
@@ -10,7 +10,10 @@ touch(superBlock *sb, int argInode, char *nomFichier){
 		 }
 		 i++;
 	 }
-	 if(ok==1){
+	 if(i==20){
+		printf("dossier plein\n");
+	 }
+	 else if(ok==1){
 	     creerFicher(sb, argInode, nomFichier);
 	     printf("fichier %s créé\n",nomFichier);
 	 }
