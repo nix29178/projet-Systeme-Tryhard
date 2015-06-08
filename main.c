@@ -5,6 +5,7 @@
 #include "cat.c"
 #include "ls.c"
 #include "chemin.c"
+#include "rm.c"
 #include <string.h>
 
 
@@ -18,9 +19,8 @@ int main(){
 	//modifContenu(sb,4,"coucou Félicien comment ca va la famille ?\n");
 	//cat(sb,4);
 	//ls(sb,1);
-
-	int res = validAbsolut(sb, "/test1/test3");
-	printf("resultat : %d\n", res);
+	rmdir(sb,3);
+	toStringBlockD(sb, 2);
 	
 	return 0;
 }

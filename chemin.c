@@ -23,7 +23,6 @@ int inodeCheminAbsolu(superBlock *sb, char *chemin){ //retourne l'inode avec che
 		for(k=0; k<j;k++){
 			tmpString[k]=chemin[i+k]; //on met le nom dans une variables
 		}
-		printf("recherche de %s\n", tmpString);
 		for(k=2;k<20;k++){
 			if(tmpD->inodes[k]!=0 && strcmp(tmpD->sousDirect[k],tmpString)==0){ //on compare avec le contenu du dossier en cours	
 				ok=1;
