@@ -1,43 +1,45 @@
 #include "blocks.h"
 #include <string.h>
 
-int validAbsolut(superBlock *sb, char *chemin){ //verifie qu'un chemin absolu existe (0 pour faux 1 pour vrai)
+int inodeCheminAbsolu(superBlock *sb, char *chemin){ //retourne l'inode avec chemin absolu (erreur : 0)
 	if(chemin[0]!='/'){ //on verifie que le chemin commence bien par un /
 		return 0;
 	}
 	else{
 		blockD *tmpD = noInodeToBlockD(sb,1);
 		int i,j,k,total,ok;
-		char *tmpString;
+		char *tmpString=malloc(sizeof(char));
 		ok=0;
 		i=1;
 		j=0;
 		k=0;
 		total = strlen(chemin);
+		
 		while(ok==0){
-		while(chemin[j+i]!='/' && j<total){ //on compte le nombre de caractères 
+		while(chemin[j+i]!='/' && j+i<total){ //on compte le nombre de caractères ;
 			j++;
 		}
-		tmpString = malloc(sizeof(char)*(j-i));
+		tmpString = realloc(tmpString,sizeof(char)*j);
 		for(k=0; k<j;k++){
 			tmpString[k]=chemin[i+k]; //on met le nom dans une variables
 		}
+		printf("recherche de %s\n", tmpString);
 		for(k=2;k<20;k++){
-			if(strcmp(tmpD->sousDirect[k],tmpString)==0){ //on compare avec le contenu du dossier en cours
+			if(tmpD->inodes[k]!=0 && strcmp(tmpD->sousDirect[k],tmpString)==0){ //on compare avec le contenu du dossier en cours	
 				ok=1;
 				break;
 			}
 		}
-		
+	
 		if(ok==0){ //nom non trouvé on renvoie faux
 			return 0;
 		}
-		else if(j==total){ //nom trouvé et fin de la chaine de caractère on renvoie vrai
-			return 1;
+		else if(j+i==total){ //nom trouvé et fin de la chaine de caractère on renvoie vrai
+			return tmpD->inodes[k];
 		}
 		else{
 			ok=0; 
-			if(noInodeToInode(sb,tmpD->inodes[k])->typeBlock==0){// nom trouvé mais pas fini on continu)
+			if(noInodeToInode(sb,tmpD->inodes[k])->typeBlock==0){// nom trouvé mais pas fini on continu
 				tmpD=noInodeToBlockD(sb, tmpD->inodes[k]);
 				i=j+2;
 				j=0;

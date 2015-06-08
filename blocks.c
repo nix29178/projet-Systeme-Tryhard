@@ -41,6 +41,7 @@ blockD *initDirec(int inodeDirect, int inodePapa, int argBlock){
 	int i;
 	for(i=2;i<20;i++){
 		tmp->inodes[i]=0;
+		tmp->sousDirect[i]=NULL;
 	}
 	tmp->next=NULL;
 	return tmp;
