@@ -14,6 +14,14 @@ struct superBlock{
 	inode *inodes;
 	blockF *blocksF;
 	blockD *blocksD;
+	int nbBlockI;
+	int maxBlockI;
+	int nbBlockF;
+	int maxBlockF;
+	int nbBlockD;
+	int maxBlockD;
+	
+	
 } SUPERBLOCK_T;
 
 superBlock *initSGF();
@@ -59,7 +67,7 @@ struct blockD{
 
 blockD *initDirec(int inodeDirect, int inodePapa, int argBlock);
 blockD *blockDLibre(blockD *blocksD);
-void creaDir(superBlock *sb, int noInodeParent, char *nomDir);
+int creaDir(superBlock *sb, int noInodeParent, char *nomDir);
 void supprDir(superBlock *sb, int argInode);
 void toStringBlockD(superBlock *sb, int argInode);
 blockD *noInodeToBlockD(superBlock *sb, int argInode);

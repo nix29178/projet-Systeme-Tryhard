@@ -13,8 +13,11 @@
 int main(){
 	superBlock *sb = initSGF();
 	touch(sb,1, "test");
+	modifContenu(sb,2,"Coucoucou beaucoup de test toussa\n");
+	char * coucou=lireFichier(sb,2);
+	printf("%s\n",coucou);
+	printf("nb inode : %d / %d\nnb blockF : %d / %d",sb->nbBlockI, sb->maxBlockI,sb->nbBlockF, sb->maxBlockF);
 	//ln(sb,2,1,"testLien");
-	printf("fichier créé\n");
 	//creaDir(sb,1,"test3");
 	//touch(sb,1,"testDeFichier");
 	//modifContenu(sb,4,"coucou Félicien comment ca va la famille ?\n");

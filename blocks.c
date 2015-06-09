@@ -16,6 +16,14 @@ superBlock *initSGF(){
 	//initilisation des blocks Fichier
 	tmp->blocksF = initBlockFvide(0);
 	tmp->blocksF->noBlockF=1;
+	
+	tmp->nbBlockI=1;
+	tmp->maxBlockI=1024;
+	tmp->nbBlockF=1;
+	tmp->maxBlockF=4096;
+	tmp->nbBlockD=1;
+	tmp->maxBlockD=1024;
+	
 	return tmp;   
 }
 
@@ -54,9 +62,6 @@ blockF *initBlockFvide(int inodeF){ //initialiste un blockF sans noBlock attribu
 	tmp->noBlockF=0;
 	tmp->used=0;
 	int i;
-	for(i=0; i<8; i++){
-		tmp->contenu[i]=NULL;
-	}
 	tmp->nextBlock=NULL;
 	tmp->nextF=NULL;
 	return tmp;
@@ -150,9 +155,13 @@ int creaDir(superBlock *sb, int noInodeParent, char *nomDir){
 	int noInode, noBlock;
 	inode *placeInode = inodeLibre(sb->inodes);
 	noInode = placeInode->noInode;
+	if(noInode>sb->nbBlockI)
+		sb->nbBlockI++;
 	placeInode->typeBlock=0;
 	
 	blockD *placeBlock = blockDLibre(sb->blocksD);
+	if(placeBlock->noBlockD>sb->nbBlockD)
+		sb->nbBlockD++;
 	noBlock = placeBlock->noBlockD;
 	
 	placeInode->block=noBlock;
@@ -203,9 +212,12 @@ int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fich
     	//on lui cherche un inode disponible
     	inode *tmpI = inodeLibre(sb->inodes);
     	tmpI->typeBlock=1;
-
+		if(tmpI->noInode>sb->nbBlockI)
+			sb->nbBlockI++;
     	
     	blockF *tmpF = blockFLibre(sb->blocksF);//on cherche un blockF de libre ou on le créer
+    	if(tmpF->noBlockF>sb->nbBlockF)
+			sb->nbBlockF++;
     	tmpF->used=1;//on le marque comme utilise
     	tmpF->noInode=tmpI->noInode;
     	
@@ -255,6 +267,8 @@ void modifContenu(superBlock *sb, int argInode, char *argContenu){//ecrase le co
 			if(i%8==0){
 				if(tmpF->nextF==NULL){
 					tmpF->nextF=blockFLibre(sb->blocksF);
+					if(tmpF->noBlockF>sb->nbBlockF)
+						sb->nbBlockF++;
 					tmpF->nextF->noInode=argInode;
 					tmpF->nextF->used=1;
 				}
