@@ -219,13 +219,23 @@ int creerFicher(superBlock *sb, int inodeDossier, char *nomfile){//creer un fich
 
 void supprFichier(superBlock *sb, int argInode, int dossier){
 		inode *tmpI = noInodeToInode(sb, argInode);
-		tmpI->typeBlock=2; //on libere l'inode
-		blockF *tmpF = noInodeToBlockF(sb, argInode);
-		while(tmpF->nextF!=NULL){
-			tmpF->used=0; //on passe tous les blockF du fichier a l'état inutilisé
-			tmpF=tmpF->nextF;
+		inode *tmpI2 = sb->inodes;
+		int alone=1;
+		while(alone==1 && tmpI2!=NULL){
+			if(tmpI2->noInode!=tmpI->noInode && tmpI2->block == tmpI->block && tmpI2->typeBlock==tmpI->typeBlock){
+				alone=0;
+			}
+			tmpI2=tmpI2->next;
 		}
-		tmpF->used=0;
+		tmpI->typeBlock=2; //on libere l'inode
+		if(alone==1){ //si aucun autre loin pointe sur le dossier on le supprime
+			blockF *tmpF = noInodeToBlockF(sb, argInode);
+			while(tmpF->nextF!=NULL){
+				tmpF->used=0; //on passe tous les blockF du fichier a l'état inutilisé
+				tmpF=tmpF->nextF;
+			}
+			tmpF->used=0;
+		}
 		//on le retire de la table du dossier
 		blockD *tmpD = noInodeToBlockD(sb,dossier);
 		int i=2;
