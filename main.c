@@ -12,15 +12,17 @@
 int main(){
 	superBlock *sb = initSGF();
 	creaDir(sb,1,"test1");
-	creaDir(sb,2,"test2");
-	creaDir(sb,2,"test3");
-	//creerFicher(sb,1,"testDeFichier");
+	creaDir(sb,2,"a");
+	creaDir(sb,3,"test3");
+	//creaDir(sb,1,"test3");
 	//touch(sb,1,"testDeFichier");
 	//modifContenu(sb,4,"coucou Félicien comment ca va la famille ?\n");
 	//cat(sb,4);
 	//ls(sb,1);
-	rmdir(sb,3);
-	toStringBlockD(sb, 2);
+	//rmdir(sb,3);
+	//toStringBlockD(sb, 2);
+	int res = chemin(sb, 1, "test1/a/test3");
+	printf("res : %d\n",res);
 	
 	return 0;
 }
