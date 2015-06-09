@@ -33,7 +33,7 @@ int rmdir(superBlock *sb, int argInode){
 	}
 }
 
-int rmfile(superBlock *sb, int argInode, int parent){
+int unlink(superBlock *sb, int argInode, int parent){
 	int type = noInodeToInode(sb, argInode)->typeBlock;
 	if(type==2){
 		printf("erreur fatale\n");

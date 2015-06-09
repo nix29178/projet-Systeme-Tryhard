@@ -18,10 +18,12 @@ int ln(superBlock *sb, int inodeBase, int dossier, char *nomlien){ //fait un ln 
 			printf("nom deja pris\n");
 			return 0;
 		}
+	}
+	for(i=2;i<20;i++){
 		if(tmpD->inodes[i]==0){
 			ok=1;
 			break;
-		}
+		}	
 	}
 	if(ok==0){
 		printf("Dossier plein");
