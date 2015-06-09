@@ -97,3 +97,52 @@ int chemin(superBlock *sb, int dossierAct, char *chemin){
 		}	
 }
 }
+
+char *cheminActuel(superBlock *sb, int argInode){
+	
+	if(noInodeToInode(sb, argInode)->typeBlock!=0){
+		printf("erreur\n");
+		return "!!";
+	}
+	blockD *tmpD = noInodeToBlockD(sb, argInode);
+	int profondeur=0;
+	while(tmpD->inodes[0]!=1){
+		profondeur ++;
+		tmpD=noInodeToBlockD(sb,tmpD->inodes[1]);
+	}
+	if(profondeur ==0){
+		return "/";
+	}
+	else{
+		char *tab[profondeur];
+		tmpD = noInodeToBlockD(sb, argInode);
+		tmpD=noInodeToBlockD(sb, tmpD->inodes[1]);
+		int i=profondeur-1,j,enCours=argInode;
+		int taille=0;
+		for(i;i>=0;i--){
+			j=2;
+			while(tmpD->inodes[j]!=enCours)
+				j++;
+			tab[i]=tmpD->sousDirect[j];
+			taille += strlen(tmpD->sousDirect[j]);
+			enCours=tmpD->inodes[0];
+			tmpD=noInodeToBlockD(sb,tmpD->inodes[1]);
+		}
+		char *res = malloc(sizeof(char)*(taille+profondeur));
+		res[0]='/';
+		i=0;j=0;
+		int encours=1;
+		for(i;i<profondeur;i++){
+			for(j=0;j<strlen(tab[i]);j++){
+				res[encours]=tab[i][j];
+				encours++;
+			}
+			if(encours!=taille+profondeur){
+				res[encours] ='/';
+				encours++;
+			}
+		}
+		return res;
+	}
+	
+}
