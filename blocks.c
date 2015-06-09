@@ -143,7 +143,7 @@ void toStringBlocksF(superBlock *sb){
 	
 }
 
-void creaDir(superBlock *sb, int noInodeParent, char *nomDir){
+int creaDir(superBlock *sb, int noInodeParent, char *nomDir){
 	
 	blockD *parent = noInodeToBlockD(sb, noInodeParent);
 	
@@ -166,7 +166,7 @@ void creaDir(superBlock *sb, int noInodeParent, char *nomDir){
 	}
 	parent->inodes[i]=noInode;
 	parent->sousDirect[i]=nomDir;
-	
+	return noInode;
 }
 
 void supprDir(superBlock *sb, int argInode){
@@ -228,7 +228,7 @@ void supprFichier(superBlock *sb, int argInode, int dossier){
 			tmpI2=tmpI2->next;
 		}
 		tmpI->typeBlock=2; //on libere l'inode
-		if(alone==1){ //si aucun autre loin pointe sur le dossier on le supprime
+		if(alone==1){ //si aucun autre lien pointe sur le blockF on le supprime
 			blockF *tmpF = noInodeToBlockF(sb, argInode);
 			while(tmpF->nextF!=NULL){
 				tmpF->used=0; //on passe tous les blockF du fichier a l'état inutilisé
