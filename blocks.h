@@ -11,16 +11,20 @@ typedef struct blockF blockF;
 typedef struct blockD blockD;
 
 struct superBlock{
+	//structures blocks
 	inode *inodes;
 	blockF *blocksF;
 	blockD *blocksD;
+	//variables pour le fd
 	int nbBlockI;
 	int maxBlockI;
 	int nbBlockF;
 	int maxBlockF;
 	int nbBlockD;
 	int maxBlockD;
-	
+	//structure utilisateur
+	user *users;
+	int userEnCours;
 	
 } SUPERBLOCK_T;
 

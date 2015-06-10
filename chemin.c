@@ -128,7 +128,7 @@ char *cheminActuel(superBlock *sb, int argInode){
 			enCours=tmpD->inodes[0];
 			tmpD=noInodeToBlockD(sb,tmpD->inodes[1]);
 		}
-		char *res = malloc(sizeof(char)*(taille+profondeur));
+		char *res = malloc(sizeof(char)*(taille+profondeur-1));
 		res[0]='/';
 		i=0;j=0;
 		int encours=1;

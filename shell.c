@@ -7,6 +7,8 @@
 #include "chemin.c"
 #include "rm.c"
 #include <string.h>
+#include "mkdir.c"
+
 
 char* recupArgs(){
 	int i =0;
@@ -46,7 +48,7 @@ char** recupTabArgs(char* Arguments){
 	}
 	else{
 		for(i=0;i<total;i++){ //on compte le nombre de d'espace ;
-			if(Arguments[i]==' ' || Arguments[i]=='\n')
+			if(Arguments[i]==' ' || Arguments[i]=='\n' )
 				j++;
 		}
 		TabArgs = malloc(sizeof(char*)*(j+1)); //initialisation de l'epace pour le nombre de chaine de char
@@ -69,10 +71,10 @@ char** recupTabArgs(char* Arguments){
 	return TabArgs	;			
 }
 
-char** InitTabfonction(){
+char** InitTabfonction(int nbfonction){
 
 	char ** TabFonction;
-	int nbfonction=4;
+	
 	int i=0;
 	TabFonction = malloc(sizeof(char*)*(nbfonction)); //initialisation de l'epace pour le nombre de chaine de char
 
@@ -94,16 +96,24 @@ char** InitTabfonction(){
 			break;
 
 			case 3:
-			TabFonction[i]=malloc(strlen("rm")*sizeof(char)); //initialisation pour charque chaine de char
-			strcpy(TabFonction[i],"rm"); // remplissage du tableau avec les fonctions	
+			TabFonction[i]=malloc(strlen("unlink")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"unlink"); // remplissage du tableau avec les fonctions	
 			break;	
+			case 4:
+			TabFonction[i]=malloc(strlen("mkdir")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"mkdir"); // remplissage du tableau avec les fonctions	
+			break;	
+			case 5:
+			TabFonction[i]=malloc(strlen("cd")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"cd"); // remplissage du tableau avec les fonctions	
+			break;
 		}
 	}
 	return TabFonction;			
 }
 
-void action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode){
-	int i,NbInstruction=-1,nbfonction=4;
+int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nbfonction){
+	int i,NbInstruction=-1;
 
 	for(i=0;i<nbfonction;i++){
 		if(strcmp(TabArgs[0],TabFonction[i])==0)
@@ -130,13 +140,23 @@ void action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode){
 
 		case 3://rm
 
-		rmdir(sb,chemin(sb,argInode,TabArgs[1]));
+		//unlink(sb,chemin(sb,argInode,TabArgs[1]));
 		break;	
+		case 4://rm
+
+		mkdir(sb,argInode,TabArgs[1]);
+		break;	
+		case 5://rm
+		if(chemin(sb,argInode,TabArgs[1])!=0)
+			argInode=chemin(sb,argInode,TabArgs[1]); 
+		
+		break;
 default:
 break;
+	
 		}
 		
-
+	return argInode;
 }
 
 int main(void){
@@ -145,17 +165,20 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=4;
+	int i,nbfonction=6;
 	int dossiercurrent=1;
 	
 	
-	TabFonction=InitTabfonction();
+	TabFonction=InitTabfonction(nbfonction);
 	for(i=0;i<nbfonction;i++)
+		printf(" %s\n",TabFonction[i]);
 
 	while (1){
+	printf(":~%s$",cheminActuel(sb,dossiercurrent));
 	arguments = recupArgs();
 	TabArgs=recupTabArgs(arguments);
-	action(TabArgs,TabFonction,sb,dossiercurrent);
+	dossiercurrent=action(TabArgs,TabFonction,sb,dossiercurrent,nbfonction);
+		
 	free(TabArgs);
 	}
 	
