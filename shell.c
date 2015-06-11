@@ -125,13 +125,21 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("chmod")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"chmod"); // remplissage du tableau avec les fonctions	
 			break;
+			case 10:
+			TabFonction[i]=malloc(strlen("help")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"help"); // remplissage du tableau avec les fonctions	
+			break;
+			case 11:
+			TabFonction[i]=malloc(strlen("exit")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"exit"); // remplissage du tableau avec les fonctions	
+			break;
 		}
 	}
 	return TabFonction;			
 }
 
 int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int nbfonction, int *userCo){
-	int i,NbInstruction=-1;
+	int i,NbInstruction=-1,k;
 
 	for(i=0;i<nbfonction;i++){
 		if(strcmp(TabArgs[0],TabFonction[i])==0)
@@ -165,8 +173,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		mkdir(sb,*argInode,TabArgs[1],*userCo);
 		break;	
 		case 5://cd
-		if(cd(sb,*argInode,TabArgs[1])!=0)
-			*argInode=cd(sb,*argInode,TabArgs[1]); 
+			*argInode=cd(sb,*argInode,TabArgs[1],*userCo); 
 		break;
 		case 6://newU
 		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL)
@@ -185,7 +192,19 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		break;
 		case 9://chmod
 			if(TabArgs[1]!=NULL && TabArgs[2]!= NULL && TabArgs[3]!= NULL)
-				chmod(sb,chemin(sb,*argInode,TabArgs[3]), *userCo,atoi(TabArgs[1]), atoi(TabArgs[2]));
+				chmod(sb,chemin(sb,*argInode,TabArgs[1]), *userCo,atoi(TabArgs[2]), atoi(TabArgs[3]));
+		break;
+		case 10:
+			
+			printf("commandes : \n");
+			for(k;k<NbInstruction;k++){
+				printf("%s\t",TabFonction[k]);
+			}
+			printf("\n");
+		break;
+		case 11:
+			printf("bye\n");
+			exit(0);
 		break;
 default:
 printf("action non reconnue\n");
@@ -202,7 +221,7 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=9;
+	int i,nbfonction=12;
 	int dossiercurrent=1;
 	int userCo=connectInterface(sb), ok=0;
 	

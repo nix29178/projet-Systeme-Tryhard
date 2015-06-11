@@ -112,6 +112,11 @@ int chmod(superBlock *sb, int argInode, int userCo, int newDroitU, int newDroitA
 		return -1;
 	}
 	inode *tmpI = noInodeToInode(sb, argInode);
+	printf("%d\n", argInode);
+	if(argInode ==0 || tmpI==NULL){
+		printf("cible incorrecte\n");
+		return 0;
+	}
 	if(userCo==0 || userCo==tmpI->proprio){//cas de l'administrateur, subZero gagne toujours ou utilisateur lambda correct
 		tmpI->droitU=newDroitU;
 		tmpI->droitA=newDroitA;
