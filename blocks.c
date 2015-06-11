@@ -17,12 +17,16 @@ superBlock *initSGF(){
 	tmp->blocksF = initBlockFvide(0);
 	tmp->blocksF->noBlockF=1;
 	
+	//donnee du DF
 	tmp->nbBlockI=1;
 	tmp->maxBlockI=1024;
 	tmp->nbBlockF=1;
 	tmp->maxBlockF=4096;
 	tmp->nbBlockD=1;
 	tmp->maxBlockD=1024;
+	
+	//initialisation des utilisateurs
+	tmp->users=initUser(0,"subZero","fatality");
 	
 	return tmp;   
 }
@@ -34,6 +38,10 @@ inode *initInode(int argInode, int argType, int argBlock){
 	tmp->typeBlock=argType;
 	tmp->block=argBlock;
 	tmp->next=NULL;
+	//initialisation des droits, par defaut tout le monde peut tout faire
+	tmp->proprio=0;
+	tmp->droitU=3;
+	tmp->droitA=3;
 	return tmp;
 }
 

@@ -9,6 +9,7 @@ typedef struct superBlock superBlock;
 typedef struct inode inode;
 typedef struct blockF blockF;
 typedef struct blockD blockD;
+typedef struct user user;
 
 struct superBlock{
 	//structures blocks
@@ -34,6 +35,12 @@ struct inode{
 	int noInode;
 	int typeBlock; //0 directory, 1 File, 2 inode inutilise
 	int block;
+	
+	//infos utilisateur
+	int proprio;
+	int droitU;
+	int droitA;
+	
 	inode *next;
 } INODE_T;
 
@@ -75,5 +82,24 @@ int creaDir(superBlock *sb, int noInodeParent, char *nomDir);
 void supprDir(superBlock *sb, int argInode);
 void toStringBlockD(superBlock *sb, int argInode);
 blockD *noInodeToBlockD(superBlock *sb, int argInode);
+
+struct user{
+	int noUser;
+	char *nom;
+	char *mdp;
+	user *next;
+} USER_T;
+
+
+user *initUser(int argnoUser, char *argNom, char *argmdp);
+user *noUserToUser(superBlock *sb, int argNumero);
+user *nomUserToUser(superBlock *sb, char *argNom);
+int connexion(superBlock *sb, char *argNom, char *mdp);
+int verifDroit(superBlock *sb, int argInode, int userCo, int action);
+int chproprio(superBlock *sb, int argInode,int uConnecte, char *argNom);
+void tableUser(superBlock *sb, int userCo);
+int newUser(superBlock *sb, char *argNom, char *mdp);
+int delUser(superBlock *sb, int userCo, char *argNom);
+
 
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "blocks.h"
+#include "user.c"
 #include "touch.c"
 #include "cat.c"
 #include "ls.c"
@@ -107,12 +108,24 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("cd")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"cd"); // remplissage du tableau avec les fonctions	
 			break;
+			case 6:
+			TabFonction[i]=malloc(strlen("newU")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"newU"); // remplissage du tableau avec les fonctions	
+			break;
+			case 7:
+			TabFonction[i]=malloc(strlen("changeU")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"changeU"); // remplissage du tableau avec les fonctions	
+			break;
+			case 8:
+			TabFonction[i]=malloc(strlen("tableU")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"tableU"); // remplissage du tableau avec les fonctions	
+			break;
 		}
 	}
 	return TabFonction;			
 }
 
-int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nbfonction){
+int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nbfonction, int *userCo){
 	int i,NbInstruction=-1;
 
 	for(i=0;i<nbfonction;i++){
@@ -122,7 +135,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nb
 
 	switch(NbInstruction){
 		case 0://touch
-		touch(sb,argInode,TabArgs[1]);
+		touch(sb,argInode,TabArgs[1],*userCo);
 		modifContenu(sb,chemin(sb,argInode,TabArgs[1]),"cosmin<3");
 		break;
 
@@ -146,10 +159,25 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nb
 
 		mkdir(sb,argInode,TabArgs[1]);
 		break;	
-		case 5://rm
+		case 5://cd
 		if(chemin(sb,argInode,TabArgs[1])!=0)
 			argInode=chemin(sb,argInode,TabArgs[1]); 
-		
+		break;
+		case 6://newU
+		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL)
+		    newUser(sb,TabArgs[1], TabArgs[2]); 
+		break;
+		case 7://changeU
+		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL){
+		    int res =connexion(sb,TabArgs[1], TabArgs[2]); 
+		    if(res !=-1){
+				printf("new id : %d\n",res);
+				*userCo=res;
+			}
+		}
+		break;
+		case 8://tableU
+		    tableUser(sb,*userCo);
 		break;
 default:
 break;
@@ -165,8 +193,9 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=6;
+	int i,nbfonction=9;
 	int dossiercurrent=1;
+	int userCo=connectInterface(sb), ok=0;
 	
 	
 	TabFonction=InitTabfonction(nbfonction);
@@ -174,10 +203,11 @@ int main(void){
 		printf(" %s\n",TabFonction[i]);
 
 	while (1){
-	printf(":~%s$",cheminActuel(sb,dossiercurrent));
+		printf("user connecté : %d\n",userCo);
+	printf("%s:~%s$",noUserToUser(sb, userCo)->nom,cheminActuel(sb,dossiercurrent));
 	arguments = recupArgs();
 	TabArgs=recupTabArgs(arguments);
-	dossiercurrent=action(TabArgs,TabFonction,sb,dossiercurrent,nbfonction);
+	dossiercurrent=action(TabArgs,TabFonction,sb,dossiercurrent,nbfonction,&userCo);
 		
 	free(TabArgs);
 	}
@@ -191,4 +221,21 @@ int main(void){
 
 
 	return 0;
+}
+
+int connectInterface(superBlock *sb){
+	int num,ok=0;
+	while(ok==0){
+		char **res;
+		printf("qui etes vous ? ");
+		res=recupTabArgs(recupArgs());
+		char *nom = res[0];
+		printf("mot de passe ? ");
+		res=recupTabArgs(recupArgs());
+		char *mdp = res[0];
+		num =connexion(sb,nom,mdp);
+		if(num !=-1)
+			ok=1;
+	}
+	return num;
 }

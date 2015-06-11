@@ -1,5 +1,6 @@
 #include "blocks.h"
 #include <string.h>
+#include <stdlib.h>
 
 int inodeCheminAbsolu(superBlock *sb, char *chemin){ //retourne l'inode avec chemin absolu (erreur : 0)
 	if(chemin[0]!='/'){ //on verifie que le chemin commence bien par un /
