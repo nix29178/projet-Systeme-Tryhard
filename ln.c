@@ -1,6 +1,10 @@
 #include "blocks.h"
 
 int ln(superBlock *sb, int inodeBase, int dossier, char *nomlien){ //fait un ln et retourne l'inode du lien (0 en cas d'erreur)
+	if(verifDroit(sb,dosser,userCo,2)==0 || verifDroit(sb,inodeBase,userCo,1)==0){
+		printf("Action interdite\n");
+	    return 0;
+	}
 	inode *base = noInodeToInode(sb, inodeBase);
 	if(base->typeBlock!=1){
 		printf("impossible de faire un ln sur un dossier\n");

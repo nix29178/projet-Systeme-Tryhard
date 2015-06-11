@@ -1,7 +1,11 @@
 #include "blocks.h"
 
-int mkdir(superBlock *sb, int InodeParent, char *nomDossier)
+int mkdir(superBlock *sb, int InodeParent, char *nomDossier, int userCo)
 {
+	if(verifDroit(sb,InodeParent,userCo,2)==0){
+		printf("action interdite\n");
+		return 0;
+	}
 	inode* ino = noInodeToInode(sb,InodeParent);
 	int ok=0,Inode=0,nom=1,i=0;
 

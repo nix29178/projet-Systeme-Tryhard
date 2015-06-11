@@ -192,5 +192,6 @@ void tableUser(superBlock *sb, int userCo){
 			printf("%s\t",tmpU->nom);
 			tmpU=tmpU->next;
 		}
+		printf("\n");
 	}
 }

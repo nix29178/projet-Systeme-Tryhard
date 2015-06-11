@@ -120,12 +120,16 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("tableU")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"tableU"); // remplissage du tableau avec les fonctions	
 			break;
+			case 9:
+			TabFonction[i]=malloc(strlen("chmod")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"chmod"); // remplissage du tableau avec les fonctions	
+			break;
 		}
 	}
 	return TabFonction;			
 }
 
-int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nbfonction, int *userCo){
+int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int nbfonction, int *userCo){
 	int i,NbInstruction=-1;
 
 	for(i=0;i<nbfonction;i++){
@@ -135,33 +139,33 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nb
 
 	switch(NbInstruction){
 		case 0://touch
-		touch(sb,argInode,TabArgs[1],*userCo);
-		modifContenu(sb,chemin(sb,argInode,TabArgs[1]),"cosmin<3");
+		touch(sb,*argInode,TabArgs[1],*userCo);
+		
 		break;
 
 		case 1://cat
 
-		cat(sb,chemin(sb,argInode,TabArgs[1]));
+		cat(sb,chemin(sb,*argInode,TabArgs[1]));
 		
 		break;
 		
 		case 2://ls
 	
-		ls(sb,argInode);		
+		ls(sb,*argInode);		
 
 		break;
 
 		case 3://rm
 
-		//unlink(sb,chemin(sb,argInode,TabArgs[1]));
+		unlink(sb,chemin(sb,*argInode, TabArgs[1]),*argInode,*userCo);
 		break;	
 		case 4://rm
 
-		mkdir(sb,argInode,TabArgs[1]);
+		mkdir(sb,*argInode,TabArgs[1],*userCo);
 		break;	
 		case 5://cd
-		if(chemin(sb,argInode,TabArgs[1])!=0)
-			argInode=chemin(sb,argInode,TabArgs[1]); 
+		if(chemin(sb,*argInode,TabArgs[1])!=0)
+			*argInode=chemin(sb,*argInode,TabArgs[1]); 
 		break;
 		case 6://newU
 		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL)
@@ -171,7 +175,6 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nb
 		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL){
 		    int res =connexion(sb,TabArgs[1], TabArgs[2]); 
 		    if(res !=-1){
-				printf("new id : %d\n",res);
 				*userCo=res;
 			}
 		}
@@ -179,12 +182,16 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int argInode,int nb
 		case 8://tableU
 		    tableUser(sb,*userCo);
 		break;
+		case 9://chmod
+			if(TabArgs[1]!=NULL && TabArgs[2]!= NULL && TabArgs[3]!= NULL)
+				chmod(sb,chemin(sb,*argInode,TabArgs[3]), *userCo,atoi(TabArgs[1]), atoi(TabArgs[2]));
+		break;
 default:
 break;
 	
 		}
 		
-	return argInode;
+	return 1;
 }
 
 int main(void){
@@ -203,11 +210,10 @@ int main(void){
 		printf(" %s\n",TabFonction[i]);
 
 	while (1){
-		printf("user connecté : %d\n",userCo);
 	printf("%s:~%s$",noUserToUser(sb, userCo)->nom,cheminActuel(sb,dossiercurrent));
 	arguments = recupArgs();
 	TabArgs=recupTabArgs(arguments);
-	dossiercurrent=action(TabArgs,TabFonction,sb,dossiercurrent,nbfonction,&userCo);
+	action(TabArgs,TabFonction,sb,&dossiercurrent,nbfonction,&userCo);
 		
 	free(TabArgs);
 	}

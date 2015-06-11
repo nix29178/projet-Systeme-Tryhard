@@ -1,6 +1,10 @@
 #include "blocks.h"
 
-int rmdir(superBlock *sb, int argInode){
+int rmdir(superBlock *sb, int argInode, int userCo){
+	if(verifDroit(sb,argInode,userCo,2)==0){
+		printf("action interdite\n");
+		return 0;
+	}
 	int type = noInodeToInode(sb, argInode)->typeBlock;
 	if(argInode==1){
 		printf("vous ne pouvez pas supprimer la racine\n");
@@ -33,8 +37,12 @@ int rmdir(superBlock *sb, int argInode){
 	}
 }
 
-int unlink(superBlock *sb, int argInode, int parent){
+int unlink(superBlock *sb, int argInode, int parent,int userCo){
 	int type = noInodeToInode(sb, argInode)->typeBlock;
+	if(verifDroit(sb,argInode,userCo,2)==0){
+		printf("action interdite\n");
+		return 0;
+	}
 	if(type==2){
 		printf("erreur fatale\n");
 		exit(2);
