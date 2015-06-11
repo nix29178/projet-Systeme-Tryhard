@@ -41,7 +41,7 @@ int inodeCheminAbsolu(superBlock *sb, char *chemin){ //retourne l'inode avec che
 			ok=0; 
 			if(noInodeToInode(sb,tmpD->inodes[k])->typeBlock==0){// nom trouvé mais pas fini on continu
 				tmpD=noInodeToBlockD(sb, tmpD->inodes[k]);
-				i=j+2;
+				i=j+1;
 				j=0;
 			}
 			else{

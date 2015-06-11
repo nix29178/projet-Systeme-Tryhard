@@ -9,6 +9,7 @@
 #include "rm.c"
 #include <string.h>
 #include "mkdir.c"
+#include "cd.c"
 
 
 char* recupArgs(){
@@ -159,13 +160,13 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 
 		unlink(sb,chemin(sb,*argInode, TabArgs[1]),*argInode,*userCo);
 		break;	
-		case 4://rm
+		case 4://mkdir
 
 		mkdir(sb,*argInode,TabArgs[1],*userCo);
 		break;	
 		case 5://cd
-		if(chemin(sb,*argInode,TabArgs[1])!=0)
-			*argInode=chemin(sb,*argInode,TabArgs[1]); 
+		if(cd(sb,*argInode,TabArgs[1])!=0)
+			*argInode=cd(sb,*argInode,TabArgs[1]); 
 		break;
 		case 6://newU
 		if(TabArgs[1]!=NULL && TabArgs[2]!=NULL)
@@ -187,6 +188,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 				chmod(sb,chemin(sb,*argInode,TabArgs[3]), *userCo,atoi(TabArgs[1]), atoi(TabArgs[2]));
 		break;
 default:
+printf("action non reconnue\n");
 break;
 	
 		}
@@ -231,6 +233,10 @@ int main(void){
 
 int connectInterface(superBlock *sb){
 	int num,ok=0;
+	system("clear");
+	printf("------------------------------------------\n");
+	printf("--- SGF Divry-Le Bourhis-Mandoc-Migeot ---\n");
+	printf("------------------------------------------\n\n");
 	while(ok==0){
 		char **res;
 		printf("qui etes vous ? ");
