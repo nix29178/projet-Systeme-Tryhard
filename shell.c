@@ -5,11 +5,15 @@
 #include "touch.c"
 #include "cat.c"
 #include "ls.c"
+#include "ln.c"
+#include "mv.c"
 #include "chemin.c"
 #include "rm.c"
 #include <string.h>
 #include "mkdir.c"
 #include "cd.c"
+#include "echo.c"
+#include "cp.c"
 
 
 char* recupArgs(){
@@ -133,6 +137,22 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("exit")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"exit"); // remplissage du tableau avec les fonctions	
 			break;
+			case 12:
+			TabFonction[i]=malloc(strlen("ln")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"ln"); // remplissage du tableau avec les fonctions	
+			break;
+			case 13:
+			TabFonction[i]=malloc(strlen("cp")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"cp"); // remplissage du tableau avec les fonctions	
+			break;
+			case 14:
+			TabFonction[i]=malloc(strlen("echo")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"echo"); // remplissage du tableau avec les fonctions	
+			break;
+			case 15:
+			TabFonction[i]=malloc(strlen("mv")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"mv"); // remplissage du tableau avec les fonctions	
+			break;
 		}
 	}
 	return TabFonction;			
@@ -206,6 +226,21 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 			printf("bye\n");
 			exit(0);
 		break;
+		case 12://ln
+			ln(sb, chemin(sb,*argInode,TabArgs[1]), chemin(sb,*argInode,TabArgs[3]), TabArgs[2],*userCo);
+		break;
+		case 13://cp
+		    cp(sb,chemin(sb,*argInode,TabArgs[1]),TabArgs[2],chemin(sb,*argInode,TabArgs[3]),*userCo);
+		break;
+		case 14://echo
+			if(chemin(sb,*argInode,TabArgs[1])!=0)
+			{
+				echo(sb,chemin(sb,*argInode,TabArgs[1]),*userCo);
+			}
+		break;
+		case 15://mv
+		    mv(sb,*argInode,chemin(sb,*argInode,TabArgs[1]),chemin(sb,*argInode,TabArgs[3]),TabArgs[2],*userCo);
+		break;
 default:
 printf("action non reconnue\n");
 break;
@@ -221,7 +256,7 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=12;
+	int i,nbfonction=16;
 	int dossiercurrent=1;
 	int userCo=connectInterface(sb), ok=0;
 	
