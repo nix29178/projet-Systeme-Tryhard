@@ -6,7 +6,6 @@
 int connexion(superBlock *sb, char *argNom, char *argmdp){ //connexion d'un utilisateur
 	user *tmpU = sb->users;
 	while(tmpU!=NULL && strcmp(argNom,tmpU->nom)!=0){
-		printf("c'est pas %s boloss\n", tmpU->nom);
 		tmpU=tmpU->next;
 	}
 	if(tmpU==NULL){
