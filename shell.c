@@ -153,6 +153,15 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("mv")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"mv"); // remplissage du tableau avec les fonctions	
 			break;
+			case 16:
+			TabFonction[i]=malloc(strlen("tableI")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"tableI"); // remplissage du tableau avec les fonctions	
+			break;
+			case 17:
+			TabFonction[i]=malloc(strlen("tableF")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"tableF"); // remplissage du tableau avec les fonctions	
+			break;
+
 		}
 	}
 	return TabFonction;			
@@ -241,6 +250,12 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		case 15://mv
 		    mv(sb,*argInode,chemin(sb,*argInode,TabArgs[1]),chemin(sb,*argInode,TabArgs[3]),TabArgs[2],*userCo);
 		break;
+		case 16://tableI
+			toStringInode(sb);
+		break;
+		case 17://tableF
+			toStringBlocksF(sb);
+		break;
 default:
 printf("action non reconnue\n");
 break;
@@ -256,7 +271,7 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=16;
+	int i,nbfonction=18;
 	int dossiercurrent=1;
 	int userCo=connectInterface(sb), ok=0;
 	
