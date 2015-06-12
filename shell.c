@@ -14,9 +14,10 @@
 #include "cd.c"
 #include "echo.c"
 #include "cp.c"
+#include "df.c"
 
 
-char* recupArgs(){
+char* recupArgs(){ //fonction pour recuperer l'entrée de l'utilisateur
 	int i =0;
 	int longueur=0;
 	char buffer[250];
@@ -37,7 +38,7 @@ char* recupArgs(){
 	return arguments;
 }
 
-char** recupTabArgs(char* Arguments){
+char** recupTabArgs(char* Arguments){ //decoupe l'entrer en plusieur sous parties
 	
 	int i,j,k,x,total,ok;
 	char ** TabArgs;
@@ -77,7 +78,7 @@ char** recupTabArgs(char* Arguments){
 	return TabArgs	;			
 }
 
-char** InitTabfonction(int nbfonction){
+char** InitTabfonction(int nbfonction){ //fonction possibles
 
 	char ** TabFonction;
 	
@@ -161,11 +162,17 @@ char** InitTabfonction(int nbfonction){
 			TabFonction[i]=malloc(strlen("tableF")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"tableF"); // remplissage du tableau avec les fonctions	
 			break;
+			case 18:
+			TabFonction[i]=malloc(strlen("tableF")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"tableF"); // remplissage du tableau avec les fonctions	
+			break;
 
 		}
 	}
 	return TabFonction;			
 }
+
+
 
 int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int nbfonction, int *userCo){
 	int i,NbInstruction=-1,k;
@@ -183,7 +190,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 
 		case 1://cat
 
-		cat(sb,chemin(sb,*argInode,TabArgs[1]));
+		cat(sb,chemin(sb,*argInode,TabArgs[1]),*userCo);
 		
 		break;
 		
@@ -256,6 +263,9 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		case 17://tableF
 			toStringBlocksF(sb);
 		break;
+		case 18://df
+			df(sb);
+		break;
 default:
 printf("action non reconnue\n");
 break;
@@ -267,20 +277,21 @@ break;
 
 int main(void){
 
-	superBlock *sb = initSGF();
+	superBlock *sb = initSGF(); //initialisation du sgf
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
 	int i,nbfonction=18;
 	int dossiercurrent=1;
-	int userCo=connectInterface(sb), ok=0;
+	int userCo=connectInterface(sb), ok=0; //connexion utilisateur
 	
 	
 	TabFonction=InitTabfonction(nbfonction);
-	for(i=0;i<nbfonction;i++)
-		printf(" %s\n",TabFonction[i]);
+	/*for(i=0;i<nbfonction;i++)
+		printf(" %s\n",TabFonction[i]);*/
+	printf("Commande help pour obtenir la liste des commandes,\n");
 
-	while (1){
+	while (1){ //boucle de commandes
 	printf("%s:~%s$",noUserToUser(sb, userCo)->nom,cheminActuel(sb,dossiercurrent));
 	arguments = recupArgs();
 	TabArgs=recupTabArgs(arguments);
@@ -320,3 +331,5 @@ int connectInterface(superBlock *sb){
 	}
 	return num;
 }
+
+

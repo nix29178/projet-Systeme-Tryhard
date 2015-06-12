@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gcc -c main.c
+gcc -c shell.c
 gcc -c blocks.c
 
-gcc main.o blocks.o -o test
+gcc shell.o blocks.o -o test
