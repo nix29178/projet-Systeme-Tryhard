@@ -166,6 +166,10 @@ char** InitTabfonction(int nbfonction){ //fonction possibles
 			TabFonction[i]=malloc(strlen("tableF")*sizeof(char)); //initialisation pour charque chaine de char
 			strcpy(TabFonction[i],"tableF"); // remplissage du tableau avec les fonctions	
 			break;
+			case 19:
+			TabFonction[i]=malloc(strlen("delU")*sizeof(char)); //initialisation pour charque chaine de char
+			strcpy(TabFonction[i],"delU"); // remplissage du tableau avec les fonctions	
+			break;
 
 		}
 	}
@@ -230,7 +234,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 			if(TabArgs[1]!=NULL && TabArgs[2]!= NULL && TabArgs[3]!= NULL)
 				chmod(sb,chemin(sb,*argInode,TabArgs[1]), *userCo,atoi(TabArgs[2]), atoi(TabArgs[3]));
 		break;
-		case 10:
+		case 10: //help
 			
 			printf("commandes : \n");
 			for(k;k<NbInstruction;k++){
@@ -266,6 +270,10 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		case 18://df
 			df(sb);
 		break;
+		case 19://delU
+			if(TabArgs[1]!=NULL)
+			delUser(sb, *userCo, TabArgs[1]);
+		break;
 default:
 printf("action non reconnue\n");
 break;
@@ -281,7 +289,7 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=18;
+	int i,nbfonction=20;
 	int dossiercurrent=1;
 	int userCo=connectInterface(sb), ok=0; //connexion utilisateur
 	
