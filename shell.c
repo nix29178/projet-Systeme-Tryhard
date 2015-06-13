@@ -274,6 +274,10 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 			if(TabArgs[1]!=NULL)
 			delUser(sb, *userCo, TabArgs[1]);
 		break;
+		case 20://changeP
+			if(TabArgs[1]!=NULL)
+			delUser(sb,chemin(TabArgs[1]), *userCo, TabArgs[2]);
+		break;
 default:
 printf("action non reconnue\n");
 break;
@@ -289,7 +293,7 @@ int main(void){
 	char * arguments;
 	char ** TabArgs;
 	char ** TabFonction;
-	int i,nbfonction=20;
+	int i,nbfonction=21;
 	int dossiercurrent=1;
 	int userCo=connectInterface(sb), ok=0; //connexion utilisateur
 	
