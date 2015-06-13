@@ -276,7 +276,7 @@ int action(char** TabArgs,char** TabFonction,superBlock *sb, int *argInode,int n
 		break;
 		case 20://changeP
 			if(TabArgs[1]!=NULL)
-			delUser(sb,chemin(TabArgs[1]), *userCo, TabArgs[2]);
+			delUser(sb, *userCo, TabArgs[2]);
 		break;
 default:
 printf("action non reconnue\n");
